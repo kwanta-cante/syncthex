@@ -1,4 +1,4 @@
-defmodule Protocol.MessageType do
+defmodule Syncthex.Proto.MessageType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
 
@@ -14,45 +14,35 @@ defmodule Protocol.MessageType do
           | :MESSAGE_TYPE_CLOSE
 
   field :MESSAGE_TYPE_CLUSTER_CONFIG, 0
-
   field :MESSAGE_TYPE_INDEX, 1
-
   field :MESSAGE_TYPE_INDEX_UPDATE, 2
-
   field :MESSAGE_TYPE_REQUEST, 3
-
   field :MESSAGE_TYPE_RESPONSE, 4
-
   field :MESSAGE_TYPE_DOWNLOAD_PROGRESS, 5
-
   field :MESSAGE_TYPE_PING, 6
-
   field :MESSAGE_TYPE_CLOSE, 7
 end
 
-defmodule Protocol.MessageCompression do
+defmodule Syncthex.Proto.MessageCompression do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
   @type t :: integer | :MESSAGE_COMPRESSION_NONE | :MESSAGE_COMPRESSION_LZ4
 
   field :MESSAGE_COMPRESSION_NONE, 0
-
   field :MESSAGE_COMPRESSION_LZ4, 1
 end
 
-defmodule Protocol.Compression do
+defmodule Syncthex.Proto.Compression do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
   @type t :: integer | :COMPRESSION_METADATA | :COMPRESSION_NEVER | :COMPRESSION_ALWAYS
 
   field :COMPRESSION_METADATA, 0
-
   field :COMPRESSION_NEVER, 1
-
   field :COMPRESSION_ALWAYS, 2
 end
 
-defmodule Protocol.FileInfoType do
+defmodule Syncthex.Proto.FileInfoType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
 
@@ -65,17 +55,13 @@ defmodule Protocol.FileInfoType do
           | :FILE_INFO_TYPE_SYMLINK
 
   field :FILE_INFO_TYPE_FILE, 0
-
   field :FILE_INFO_TYPE_DIRECTORY, 1
-
   field :FILE_INFO_TYPE_SYMLINK_FILE, 2
-
   field :FILE_INFO_TYPE_SYMLINK_DIRECTORY, 3
-
   field :FILE_INFO_TYPE_SYMLINK, 4
 end
 
-defmodule Protocol.ErrorCode do
+defmodule Syncthex.Proto.ErrorCode do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
 
@@ -87,15 +73,12 @@ defmodule Protocol.ErrorCode do
           | :ERROR_CODE_INVALID_FILE
 
   field :ERROR_CODE_NO_ERROR, 0
-
   field :ERROR_CODE_GENERIC, 1
-
   field :ERROR_CODE_NO_SUCH_FILE, 2
-
   field :ERROR_CODE_INVALID_FILE, 3
 end
 
-defmodule Protocol.FileDownloadProgressUpdateType do
+defmodule Syncthex.Proto.FileDownloadProgressUpdateType do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3
 
@@ -105,11 +88,10 @@ defmodule Protocol.FileDownloadProgressUpdateType do
           | :FILE_DOWNLOAD_PROGRESS_UPDATE_TYPE_FORGET
 
   field :FILE_DOWNLOAD_PROGRESS_UPDATE_TYPE_APPEND, 0
-
   field :FILE_DOWNLOAD_PROGRESS_UPDATE_TYPE_FORGET, 1
 end
 
-defmodule Protocol.Hello do
+defmodule Syncthex.Proto.Hello do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -121,40 +103,40 @@ defmodule Protocol.Hello do
 
   defstruct [:device_name, :client_name, :client_version]
 
-  field :device_name, 1, type: :string
-  field :client_name, 2, type: :string
-  field :client_version, 3, type: :string
+  field :device_name, 1, type: :string, json_name: "deviceName"
+  field :client_name, 2, type: :string, json_name: "clientName"
+  field :client_version, 3, type: :string, json_name: "clientVersion"
 end
 
-defmodule Protocol.Header do
+defmodule Syncthex.Proto.Header do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          type: Protocol.MessageType.t(),
-          compression: Protocol.MessageCompression.t()
+          type: Syncthex.Proto.MessageType.t(),
+          compression: Syncthex.Proto.MessageCompression.t()
         }
 
   defstruct [:type, :compression]
 
-  field :type, 1, type: Protocol.MessageType, enum: true
-  field :compression, 2, type: Protocol.MessageCompression, enum: true
+  field :type, 1, type: Syncthex.Proto.MessageType, enum: true
+  field :compression, 2, type: Syncthex.Proto.MessageCompression, enum: true
 end
 
-defmodule Protocol.ClusterConfig do
+defmodule Syncthex.Proto.ClusterConfig do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          folders: [Protocol.Folder.t()]
+          folders: [Syncthex.Proto.Folder.t()]
         }
 
   defstruct [:folders]
 
-  field :folders, 1, repeated: true, type: Protocol.Folder
+  field :folders, 1, repeated: true, type: Syncthex.Proto.Folder
 end
 
-defmodule Protocol.Folder do
+defmodule Syncthex.Proto.Folder do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -166,7 +148,7 @@ defmodule Protocol.Folder do
           ignore_delete: boolean,
           disable_temp_indexes: boolean,
           paused: boolean,
-          devices: [Protocol.Device.t()]
+          devices: [Syncthex.Proto.Device.t()]
         }
 
   defstruct [
@@ -182,23 +164,23 @@ defmodule Protocol.Folder do
 
   field :id, 1, type: :string
   field :label, 2, type: :string
-  field :read_only, 3, type: :bool
-  field :ignore_permissions, 4, type: :bool
-  field :ignore_delete, 5, type: :bool
-  field :disable_temp_indexes, 6, type: :bool
+  field :read_only, 3, type: :bool, json_name: "readOnly"
+  field :ignore_permissions, 4, type: :bool, json_name: "ignorePermissions"
+  field :ignore_delete, 5, type: :bool, json_name: "ignoreDelete"
+  field :disable_temp_indexes, 6, type: :bool, json_name: "disableTempIndexes"
   field :paused, 7, type: :bool
-  field :devices, 16, repeated: true, type: Protocol.Device
+  field :devices, 16, repeated: true, type: Syncthex.Proto.Device
 end
 
-defmodule Protocol.Device do
+defmodule Syncthex.Proto.Device do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
           id: binary,
           name: String.t(),
-          addresses: [String.t()],
-          compression: Protocol.Compression.t(),
+          addresses: String.t(),
+          compression: Syncthex.Proto.Compression.t(),
           cert_name: String.t(),
           max_sequence: integer,
           introducer: boolean,
@@ -223,46 +205,46 @@ defmodule Protocol.Device do
   field :id, 1, type: :bytes
   field :name, 2, type: :string
   field :addresses, 3, repeated: true, type: :string
-  field :compression, 4, type: Protocol.Compression, enum: true
-  field :cert_name, 5, type: :string
-  field :max_sequence, 6, type: :int64
+  field :compression, 4, type: Syncthex.Proto.Compression, enum: true
+  field :cert_name, 5, type: :string, json_name: "certName"
+  field :max_sequence, 6, type: :int64, json_name: "maxSequence"
   field :introducer, 7, type: :bool
-  field :index_id, 8, type: :uint64
-  field :skip_introduction_removals, 9, type: :bool
-  field :encryption_password_token, 10, type: :bytes
+  field :index_id, 8, type: :uint64, json_name: "indexId"
+  field :skip_introduction_removals, 9, type: :bool, json_name: "skipIntroductionRemovals"
+  field :encryption_password_token, 10, type: :bytes, json_name: "encryptionPasswordToken"
 end
 
-defmodule Protocol.Index do
+defmodule Syncthex.Proto.Index do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
           folder: String.t(),
-          files: [Protocol.FileInfo.t()]
+          files: [Syncthex.Proto.FileInfo.t()]
         }
 
   defstruct [:folder, :files]
 
   field :folder, 1, type: :string
-  field :files, 2, repeated: true, type: Protocol.FileInfo
+  field :files, 2, repeated: true, type: Syncthex.Proto.FileInfo
 end
 
-defmodule Protocol.IndexUpdate do
+defmodule Syncthex.Proto.IndexUpdate do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
           folder: String.t(),
-          files: [Protocol.FileInfo.t()]
+          files: [Syncthex.Proto.FileInfo.t()]
         }
 
   defstruct [:folder, :files]
 
   field :folder, 1, type: :string
-  field :files, 2, repeated: true, type: Protocol.FileInfo
+  field :files, 2, repeated: true, type: Syncthex.Proto.FileInfo
 end
 
-defmodule Protocol.FileInfo do
+defmodule Syncthex.Proto.FileInfo do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -271,13 +253,13 @@ defmodule Protocol.FileInfo do
           size: integer,
           modified_s: integer,
           modified_by: non_neg_integer,
-          version: Protocol.Vector.t() | nil,
+          version: Syncthex.Proto.Vector.t() | nil,
           sequence: integer,
-          blocks: [Protocol.BlockInfo.t()],
+          blocks: [Syncthex.Proto.BlockInfo.t()],
           symlink_target: String.t(),
           blocks_hash: binary,
           encrypted: binary,
-          type: Protocol.FileInfoType.t(),
+          type: Syncthex.Proto.FileInfoType.t(),
           permissions: non_neg_integer,
           modified_ns: integer,
           block_size: integer,
@@ -312,26 +294,26 @@ defmodule Protocol.FileInfo do
 
   field :name, 1, type: :string
   field :size, 3, type: :int64
-  field :modified_s, 5, type: :int64
-  field :modified_by, 12, type: :uint64
-  field :version, 9, type: Protocol.Vector
+  field :modified_s, 5, type: :int64, json_name: "modifiedS"
+  field :modified_by, 12, type: :uint64, json_name: "modifiedBy"
+  field :version, 9, type: Syncthex.Proto.Vector
   field :sequence, 10, type: :int64
-  field :blocks, 16, repeated: true, type: Protocol.BlockInfo
-  field :symlink_target, 17, type: :string
-  field :blocks_hash, 18, type: :bytes
+  field :blocks, 16, repeated: true, type: Syncthex.Proto.BlockInfo
+  field :symlink_target, 17, type: :string, json_name: "symlinkTarget"
+  field :blocks_hash, 18, type: :bytes, json_name: "blocksHash"
   field :encrypted, 19, type: :bytes
-  field :type, 2, type: Protocol.FileInfoType, enum: true
+  field :type, 2, type: Syncthex.Proto.FileInfoType, enum: true
   field :permissions, 4, type: :uint32
-  field :modified_ns, 11, type: :int32
-  field :block_size, 13, type: :int32
-  field :local_flags, 1000, type: :uint32
-  field :version_hash, 1001, type: :bytes
+  field :modified_ns, 11, type: :int32, json_name: "modifiedNs"
+  field :block_size, 13, type: :int32, json_name: "blockSize"
+  field :local_flags, 1000, type: :uint32, json_name: "localFlags"
+  field :version_hash, 1001, type: :bytes, json_name: "versionHash"
   field :deleted, 6, type: :bool
   field :invalid, 7, type: :bool
-  field :no_permissions, 8, type: :bool
+  field :no_permissions, 8, type: :bool, json_name: "noPermissions"
 end
 
-defmodule Protocol.BlockInfo do
+defmodule Syncthex.Proto.BlockInfo do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -347,23 +329,23 @@ defmodule Protocol.BlockInfo do
   field :hash, 3, type: :bytes
   field :offset, 1, type: :int64
   field :size, 2, type: :int32
-  field :weak_hash, 4, type: :uint32
+  field :weak_hash, 4, type: :uint32, json_name: "weakHash"
 end
 
-defmodule Protocol.Vector do
+defmodule Syncthex.Proto.Vector do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          counters: [Protocol.Counter.t()]
+          counters: [Syncthex.Proto.Counter.t()]
         }
 
   defstruct [:counters]
 
-  field :counters, 1, repeated: true, type: Protocol.Counter
+  field :counters, 1, repeated: true, type: Syncthex.Proto.Counter
 end
 
-defmodule Protocol.Counter do
+defmodule Syncthex.Proto.Counter do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -378,7 +360,7 @@ defmodule Protocol.Counter do
   field :value, 2, type: :uint64
 end
 
-defmodule Protocol.Request do
+defmodule Syncthex.Proto.Request do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
@@ -402,65 +384,69 @@ defmodule Protocol.Request do
   field :offset, 4, type: :int64
   field :size, 5, type: :int32
   field :hash, 6, type: :bytes
-  field :from_temporary, 7, type: :bool
-  field :weak_hash, 8, type: :uint32
-  field :block_no, 9, type: :int32
+  field :from_temporary, 7, type: :bool, json_name: "fromTemporary"
+  field :weak_hash, 8, type: :uint32, json_name: "weakHash"
+  field :block_no, 9, type: :int32, json_name: "blockNo"
 end
 
-defmodule Protocol.Response do
+defmodule Syncthex.Proto.Response do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
           id: integer,
           data: binary,
-          code: Protocol.ErrorCode.t()
+          code: Syncthex.Proto.ErrorCode.t()
         }
 
   defstruct [:id, :data, :code]
 
   field :id, 1, type: :int32
   field :data, 2, type: :bytes
-  field :code, 3, type: Protocol.ErrorCode, enum: true
+  field :code, 3, type: Syncthex.Proto.ErrorCode, enum: true
 end
 
-defmodule Protocol.DownloadProgress do
+defmodule Syncthex.Proto.DownloadProgress do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
           folder: String.t(),
-          updates: [Protocol.FileDownloadProgressUpdate.t()]
+          updates: [Syncthex.Proto.FileDownloadProgressUpdate.t()]
         }
 
   defstruct [:folder, :updates]
 
   field :folder, 1, type: :string
-  field :updates, 2, repeated: true, type: Protocol.FileDownloadProgressUpdate
+  field :updates, 2, repeated: true, type: Syncthex.Proto.FileDownloadProgressUpdate
 end
 
-defmodule Protocol.FileDownloadProgressUpdate do
+defmodule Syncthex.Proto.FileDownloadProgressUpdate do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          update_type: Protocol.FileDownloadProgressUpdateType.t(),
+          update_type: Syncthex.Proto.FileDownloadProgressUpdateType.t(),
           name: String.t(),
-          version: Protocol.Vector.t() | nil,
-          block_indexes: [integer],
+          version: Syncthex.Proto.Vector.t() | nil,
+          block_indexes: integer,
           block_size: integer
         }
 
   defstruct [:update_type, :name, :version, :block_indexes, :block_size]
 
-  field :update_type, 1, type: Protocol.FileDownloadProgressUpdateType, enum: true
+  field :update_type, 1,
+    type: Syncthex.Proto.FileDownloadProgressUpdateType,
+    enum: true,
+    json_name: "updateType"
+
   field :name, 2, type: :string
-  field :version, 3, type: Protocol.Vector
-  field :block_indexes, 4, repeated: true, type: :int32
-  field :block_size, 5, type: :int32
+  field :version, 3, type: Syncthex.Proto.Vector
+  field :block_indexes, 4, repeated: true, type: :int32, json_name: "blockIndexes"
+  field :block_size, 5, type: :int32, json_name: "blockSize"
 end
 
-defmodule Protocol.Ping do
+defmodule Syncthex.Proto.Ping do
   @moduledoc false
   use Protobuf, syntax: :proto3
   @type t :: %__MODULE__{}
@@ -468,7 +454,7 @@ defmodule Protocol.Ping do
   defstruct []
 end
 
-defmodule Protocol.Close do
+defmodule Syncthex.Proto.Close do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
