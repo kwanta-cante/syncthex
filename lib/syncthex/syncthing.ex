@@ -2,12 +2,16 @@ defmodule Syncthex.Syncthing do
   @moduledoc """
   Syncthing client bindings using Tesla
   """
+  alias Syncthex.Syncthing.ProtobufMiddleware
   @doc """
   creates a client instance.
 
   the parameters `:url` and `:key` can be supplied in a map.
   Missing params are gatherted from `Application.get_all_env/1`
-
+  Config options (map keys):
+  * `deserialized_type` defaults to `:struct`
+    * value `:json` deserializes to a Map
+    * value `:struct` deserializes to the corresponding generated struct from `Syncthex.Proto`
   """
 
   def client, do:
@@ -25,7 +29,10 @@ defmodule Syncthex.Syncthing do
     [
       {Tesla.Middleware.BaseUrl, url},
       {Tesla.Middleware.Headers, [{"X-API-Key", key}]},
-      Tesla.Middleware.JSON
+      ProtobufMiddleware,
+      Tesla.Middleware.JSON,
+
+
     ]
     |> Tesla.client(adapter)
   end
@@ -48,6 +55,8 @@ defmodule Syncthex.Syncthing do
         |>Map.put(:api_cert, Path.join(System.user_home!, path))
     end
   end
+  defp config_with_deserialized_type(%{deserialized_type: _} = config), do: config
+  defp config_with_deserialized_type(config), do: Map.put(config, :deserialized_type, :struct)
   defp config(), do:
     Application.get_all_env(:syncthex)
     |> Keyword.take([:url, :key])

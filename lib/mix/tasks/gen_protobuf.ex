@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.GenProtobuf do
   use Mix.Task
+  alias Syncthex.Utils.FileList
   @moduledoc """
   Task for generating the procol Buffer definitions.
   It checks out all needed repositories into /proto,
@@ -24,8 +25,14 @@ defmodule Mix.Tasks.GenProtobuf do
   @proto_defs [
     "repos/protobuf/gogoproto/gogo.proto",
     "lib/protocol/bep.proto",
-    "lib/discover/local.proto"
+    "lib/discover/local.proto",
+
   ]
+  |> FileList.add_glob(@proto_path <> "/lib/config/*.proto")
+  |> FileList.add_glob(@proto_path <> "/lib/db/*.proto")
+  |> FileList.add_glob(@proto_path <> "/lib/fs/*.proto")
+  |> Enum.map(fn file-> Path.relative_to(file, @proto_path) end)
+
   @generated_modules_prefix "Syncthex.Proto"
   def write_elixir_pb_proto(file), do: write_elixir_pb_proto(file, %{
     prefix: @generated_modules_prefix
@@ -81,6 +88,8 @@ defmodule Mix.Tasks.GenProtobuf do
 
     # Needed to honor the module options
     Mix.shell.cmd "mix escript.install --force github tony612/protobuf-elixir"
+    # This bug haunts: https://github.com/elixir-protobuf/protobuf/issues/133
+    # Mix.shell.cmd "mix escript.install --force github tony612/protobuf-elixir tag v0.7.1"
     checkout(@git_checkout_links)
     Mix.shell.cmd( "mkdir -p " <> @target_dir )
     #write_elixir_pb_proto( @proto_path <> "/" <>@elixir_pb_proto_options)
