@@ -1,1 +1,4 @@
-[]
+["proto/syncthing/proto/repos/protobuf/protobuf/google/protobuf/descriptor.proto",
+ "proto/syncthing/proto/lib/protocol/bep.proto",
+ "proto/syncthing/proto/lib/discover/local.proto",
+ "proto/syncthing/proto/repos/protobuf/gogoproto/gogo.proto"]

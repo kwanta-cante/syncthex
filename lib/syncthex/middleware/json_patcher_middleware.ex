@@ -5,11 +5,14 @@ defmodule Syncthex.Syncthing.JsonPatcher do
 
   The value transformations are:
 
-    - `&enum_val_matches?/2` matches  ":FOLDER_TYPE_SEND_ONLY" to "sendonly" (lower case `&String.ends_with?/2` test after "_" are removed)
+    - for enum some custom property names are mapped to the struct.
     - `&with_float_coerce/1` will transform integer json values into floating values for processing by Protobuf
+
+  ## TODO:
+    Manual Mapping is done for some json fields. This is nessesary because []()
+    This is because the extention property ext.json, which is properly contained in
+
   """
-
-
   def patch(%{}= json_message, proto_type ) do
     json_message
     |> Enum.map(fn {k, v} -> {k, with_patch(k, v, get_field_type(proto_type, k))} end)

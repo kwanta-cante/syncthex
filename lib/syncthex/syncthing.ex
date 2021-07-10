@@ -31,8 +31,6 @@ defmodule Syncthex.Syncthing do
       {Tesla.Middleware.Headers, [{"X-API-Key", key}]},
       ProtobufMiddleware,
       Tesla.Middleware.JSON,
-
-
     ]
     |> Tesla.client(adapter)
   end
