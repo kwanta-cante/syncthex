@@ -48,16 +48,13 @@ defmodule Syncthex.Syncthing.JsonPatcher do
       "natTimeoutSeconds" -> :nat_traversal_timeout_s
       "natEnabled" -> :nat_traversal_enabled
       "remoteIgnoredDevices" -> :ignored_devices
+      "deviceID"->:device_id
       _ -> String.to_existing_atom(Macro.underscore(name))
     end
     field_id =
       msg_props.field_tags
       |> Map.get(key)
-    ret = msg_props.field_props[field_id]
-    unless ret do
-      require IEx; IEx.pry
-    end
-    ret
+    msg_props.field_props[field_id]
   end
   def with_patch(name, [first_value| other_vals], field_def), do: [
       with_patch(name, first_value, field_def)

@@ -1,13 +1,13 @@
 defmodule Syncthex.SyncthingTest do
   use ExUnit.Case
-  alias Syncthex.Syncthing
+  alias Syncthex.Syncthing.REST
   use Snapshy
   setup_all do
-    client = Syncthing.client()
+    client = REST.client()
     {:ok, %{client: client}}
   end
   test_snapshot "grab config", %{client: client} do
-    {:ok, config_resp} = Syncthing.config(client)
+    {:ok, config_resp} = REST.config(client)
     require IEx
     IEx.pry
     assert config_resp.body
