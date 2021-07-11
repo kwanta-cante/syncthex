@@ -14,7 +14,6 @@ defmodule Syncthex.SyncthingTest do
       |> hd
     assert is_bitstring(first_device.device_id)
     assert String.length(first_device.device_id) > 0
-
     assert is_bitstring(first_device.name)
   end
   test "compare /rest/config with /rest/config/devices and with /rest/config/devices/id", %{client: client} do

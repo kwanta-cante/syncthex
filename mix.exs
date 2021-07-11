@@ -32,7 +32,8 @@ defmodule Syncthex.MixProject do
       {:snapshy, "~> 0.2", only: [:test]},
       #{:exprotobuf, "~> 1.2.17"},
       #{:protobuf, "~> 0.7.1"},
-      {:protobuf, git: "https://github.com/elixir-protobuf/protobuf.git"},
+      #{:protobuf, git: "https://github.com/kwanta-cante/protobuf.git"},
+      {:protobuf, path: "../protobuf"}
       # Only for files generated from Google's protos.
       # Can be ignored if you don't use Google's protos.
       # Or you can generate the code by yourself.

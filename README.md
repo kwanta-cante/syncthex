@@ -34,7 +34,7 @@ code generation is implmented as the task `mix gen_protobuf`, which
 
 ```proto
 import "repos/elixir-protobuf/src/elixirpb.proto";
-option (elixirpb.file).module_prefix = "Syncthex.Proto";
+option (elixirpb.file).module_prefix = "Syncthex.Proto.<CamelizedProtoPackage>";
 ```
 
 * generates code into `lib/generated`

@@ -23,38 +23,11 @@ defmodule Syncthex.Syncthing.JsonPatcher do
   the name is supplied as a string
   """
   defp get_field_type(msg_def, name) when is_bitstring(name) and is_atom(msg_def) do
-    msg_props = msg_def.__message_props__
-    key = case name do
-      "maxRequestKiB"-> :max_request_kib
-      "junctionsAsDirs" -> :follow_junctions
-      "pullerMaxPendingKiB" -> :puller_max_pending_kib
-      "insecureSkipHostcheck" -> :insecure_skip_host_check
-      "urSeen" -> :usage_reporting_seen
-      "urAccepted" -> :usage_reporting_accepted
-      "localAnnounceEnabled" -> :local_announce_enabled
-      "localAnnounceMCAddr" -> :local_announce_multicast_address
-      "globalAnnounceServers" -> :global_discovery_servers
-      "globalAnnounceEnabled" -> :global_discovery_enabled
-      "urUniqueId" -> :usage_reporting_unique_id
-      "relayReconnectIntervalM" -> :relays_reconnect_interval_m
-      "crURL" -> :crash_reporting_url
-      "urPostInsecurely" -> :usage_reporting_post_insecurely
-      "urURL" -> :usage_reporting_url
-      "natRenewalMinutes" -> :nat_traversal_renewal_m
-      "natLeaseMinutes" -> :nat_traversal_lease_m
-      "maxConcurrentIncomingRequestKiB" -> :max_concurrent_incoming_request_kib
-      "urInitialDelayS" -> :usage_reporting_initial_delay_s
-      "unackedNotificationIDs" -> :unacked_notification_ids
-      "natTimeoutSeconds" -> :nat_traversal_timeout_s
-      "natEnabled" -> :nat_traversal_enabled
-      "remoteIgnoredDevices" -> :ignored_devices
-      "deviceID"->:device_id
-      _ -> String.to_existing_atom(Macro.underscore(name))
-    end
-    field_id =
-      msg_props.field_tags
-      |> Map.get(key)
-    msg_props.field_props[field_id]
+   ret=
+    msg_def.__message_props__.field_props
+    |> Enum.find( fn {idx, field_spec}->  field_spec.json_name==name end)
+    |> elem(1)
+  ret
   end
   def with_patch(name, [first_value| other_vals], field_def), do: [
       with_patch(name, first_value, field_def)

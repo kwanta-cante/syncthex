@@ -1,4 +1,4 @@
-defmodule Syncthex.Proto.PbExtension do
+defmodule Syncthex.Proto.Gogoproto.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
   extend Google.Protobuf.EnumOptions, :goproto_enum_prefix, 62001, optional: true, type: :bool

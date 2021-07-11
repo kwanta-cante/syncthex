@@ -9,15 +9,15 @@ defmodule Syncthex.Syncthing.REST do
     to return the correct types
   """
   @type_to_url [
-    {Proto.Configuration, "/rest/config" },
-    {Proto.GUIConfiguration, "/rest/config/gui" },
-    {Proto.LDAPConfiguration, "/rest/config/ldap" },
+    {Proto.Config.Configuration, "/rest/config" },
+    {Proto.Config.GUIConfiguration, "/rest/config/gui" },
+    {Proto.Config.LDAPConfiguration, "/rest/config/ldap" },
 
-    {Proto.DeviceConfiguration, {"/rest/config/devices", array: true} },
-    {Proto.FolderConfiguration, {"/rest/config/folders", array: true} },
+    {Proto.Config.DeviceConfiguration, {"/rest/config/devices", array: true} },
+    {Proto.Config.FolderConfiguration, {"/rest/config/folders", array: true} },
     ## regex configs are a bit more expensive to match, so test at the end
-    {Proto.DeviceConfiguration, ~r"/rest/config/devices/[a-zA-Z0-9]*" },
-    {Proto.FolderConfiguration, ~r"/rest/config/folders/[a-zA-Z0-9]*" },
+    {Proto.Config.DeviceConfiguration, ~r"/rest/config/devices/[a-zA-Z0-9]*" },
+    {Proto.Config.FolderConfiguration, ~r"/rest/config/folders/[a-zA-Z0-9]*" },
   ]
   @doc """
   creates a client instance.
