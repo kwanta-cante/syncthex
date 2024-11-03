@@ -27,19 +27,25 @@ The `Syncthex.Syncthing` module contains all queries exposed via the rest endpoi
 
 ## Code Generation
 
-code generation is implmented as the task `mix gen_protobuf`, which
+For code generation you need both
 
-- downloads repos containing all external dependencies of synthing's `.proto` files
-- adds the prefix declarations like those:
+- [protoc installed](https://grpc.io/docs/protoc-installation/)
 
-```proto
-import "repos/elixir-protobuf/src/elixirpb.proto";
-option (elixirpb.file).module_prefix = "Syncthex.Proto.<CamelizedProtoPackage>";
+```bash
+ apt install -y protobuf-compiler
 ```
 
+- [Elixir protobuf](https://github.com/elixir-protobuf/protobuf) installed:
+
+```bash
+mix escript.install hex protobuf
+```
+
+code generation is implmented as the task `mix regen`, which
+
+- downloads repos containing all external dependencies of synthing's `.proto` files
+
 - generates code into `lib/generated`
-- places the message strucs into the `Synthex.Proto.*` namespace
-  **TODO:** use pbf file locations for creating namespaces)
 
 ## Installation
 

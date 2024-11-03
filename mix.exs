@@ -7,7 +7,8 @@ defmodule Syncthex.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -18,6 +19,11 @@ defmodule Syncthex.MixProject do
       mod: {Syncthex.Application, []}
     ]
   end
+
+  def aliases(),
+    do: [
+      regen: "syncthex.regenerate"
+    ]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
@@ -30,14 +36,14 @@ defmodule Syncthex.MixProject do
       # optional, required by JSON middleware
       {:jason, ">= 1.0.0"},
       {:snapshy, "~> 0.2", only: [:test]},
-      #{:exprotobuf, "~> 1.2.17"},
-      #{:protobuf, "~> 0.7.1"},
-      #{:protobuf, git: "https://github.com/kwanta-cante/protobuf.git"},
+      # {:exprotobuf, "~> 1.2.17"},
+      # {:protobuf, "~> 0.7.1"},
+      # {:protobuf, git: "https://github.com/kwanta-cante/protobuf.git"},
       {:protobuf, path: "../protobuf"}
       # Only for files generated from Google's protos.
       # Can be ignored if you don't use Google's protos.
       # Or you can generate the code by yourself.
-      #{:google_protos, "~> 0.1"}
+      # {:google_protos, "~> 0.1"}
     ]
   end
 end
