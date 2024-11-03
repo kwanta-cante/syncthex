@@ -9,6 +9,8 @@ defmodule Syncthex.Middleware.Decoder do
   end
 
   # this unwraps the body
+  def decode({:error, _} = err), do: err
+
   def decode({:ok, %{body: json_body}}, result_type),
     do: decode(json_body, result_type)
 
@@ -18,7 +20,6 @@ defmodule Syncthex.Middleware.Decoder do
     |> Protobuf.JSON.from_decoded(result_type)
   end
 
-  # this secodes arrays
   def decode([first | rest], [result_type]) do
     case decode(first, result_type) do
       {:ok, result} -> {:ok, [result | decode(rest, [result_type])]}
@@ -26,5 +27,9 @@ defmodule Syncthex.Middleware.Decoder do
     end
   end
 
-  def decode([], result_type), do: []
+  def decode([], _result_type), do: []
+
+  def decode(event, Syncthex.Syncthing.Event) do
+    {:ok, Syncthex.Syncthing.Event.decode(event)}
+  end
 end

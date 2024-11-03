@@ -4,20 +4,21 @@ defmodule Syncthex.Syncthing.REST do
   """
   alias Syncthex.Middleware
   alias Syncthex.Proto
+
   @doc """
     These mappingsa are used to uinform the `&Syncthex.Middleware.ResponseType` middleware
     to return the correct types
   """
   @type_to_url [
-    {Proto.Config.Configuration, "/rest/config" },
-    {Proto.Config.GUIConfiguration, "/rest/config/gui" },
-    {Proto.Config.LDAPConfiguration, "/rest/config/ldap" },
-
-    {Proto.Config.DeviceConfiguration, {"/rest/config/devices", array: true} },
-    {Proto.Config.FolderConfiguration, {"/rest/config/folders", array: true} },
+    {Syncthex.Syncthing.Event, "/rest/events"},
+    {Proto.Config.Configuration, "/rest/config"},
+    {Proto.Config.GUIConfiguration, "/rest/config/gui"},
+    {Proto.Config.LDAPConfiguration, "/rest/config/ldap"},
+    {Proto.Config.DeviceConfiguration, {"/rest/config/devices", array: true}},
+    {Proto.Config.FolderConfiguration, {"/rest/config/folders", array: true}},
     ## regex configs are a bit more expensive to match, so test at the end
-    {Proto.Config.DeviceConfiguration, ~r"/rest/config/devices/[a-zA-Z0-9]*" },
-    {Proto.Config.FolderConfiguration, ~r"/rest/config/folders/[a-zA-Z0-9]*" },
+    {Proto.Config.DeviceConfiguration, ~r"/rest/config/devices/[a-zA-Z0-9]*"},
+    {Proto.Config.FolderConfiguration, ~r"/rest/config/folders/[a-zA-Z0-9]*"}
   ]
   @doc """
   creates a client instance.
@@ -31,42 +32,49 @@ defmodule Syncthex.Syncthing.REST do
   """
 
   def client, do: config() |> client
-  def client(%{url: url, key: key} = config) do
 
+  def client(%{url: url, key: key} = config) do
     adapter =
       case config do
-        %{api_cert: cert_file}->
-          {Tesla.Adapter.Hackney, [recv_timeout: 30_000, ssl_options: [ cacertfile: cert_file]]}
-        _->
+        %{api_cert: cert_file} ->
+          {Tesla.Adapter.Hackney, [recv_timeout: 30_000, ssl_options: [cacertfile: cert_file]]}
+
+        _ ->
           {Tesla.Adapter.Hackney, [recv_timeout: 30_000]}
       end
+
     [
       {Middleware.ResponseType, type_to_url: @type_to_url},
       {Tesla.Middleware.BaseUrl, url},
       {Tesla.Middleware.Headers, [{"X-API-Key", key}]},
       Middleware.Decoder,
-      Tesla.Middleware.JSON,
+      Tesla.Middleware.JSON
     ]
     |> Tesla.client(adapter)
   end
-  def client(%{}=map) do
+
+  def client(%{} = map) do
     config()
     |> Map.merge(map)
     |> client()
   end
+
   ### /rest/* bindings
   def config(client),
-   do: do_call(client,"/rest/config")
+    do: do_call(client, "/rest/config")
+
   def config_restart_required?(client),
     do: do_call(client, "/rest/config/restart-required")
 
   def config_folders(client),
     do: do_call(client, "/rest/config/folders")
+
   def config_folder(client, folder_id) when is_bitstring(folder_id),
     do: do_call(client, "/rest/config/folders/#{folder_id}")
 
   def config_devices(client),
     do: do_call(client, "/rest/config/devices")
+
   def config_device(client, device_id) when is_bitstring(device_id),
     do: do_call(client, "/rest/config/devices/#{device_id}")
 
@@ -81,21 +89,40 @@ defmodule Syncthex.Syncthing.REST do
 
   defp config_with_cert(config) do
     case Application.get_env(:syncthex, :api_cert) do
-      nil-> config
+      nil ->
+        config
+
       {:SYSTEM_HOME, path} ->
         config
-        |>Map.put(:api_cert, Path.join(System.user_home!, path))
+        |> Map.put(:api_cert, Path.join(System.user_home!(), path))
     end
   end
+
+  @spec events(Tesla.Client.t(), false | nil | keyword()) ::
+          {:error, any()} | {:ok, Tesla.Env.t()}
+  def events(client, opts \\ []),
+    do:
+      do_call(
+        client,
+        "/rest/events",
+        (opts || []) |> Keyword.take([:since, :limit, :timeout])
+      )
+
   defp do_call(client, url) do
     Tesla.get(client, url)
   end
+
+  defp do_call(client, url, params) do
+    Tesla.get(client, url, query: params)
+  end
+
   defp config_with_deserialized_type(%{deserialized_type: _} = config), do: config
   defp config_with_deserialized_type(config), do: Map.put(config, :deserialized_type, :struct)
-  defp config(), do:
-    Application.get_all_env(:syncthex)
-    |> Keyword.take([:url, :key])
-    |> Map.new()
-    |> config_with_cert()
 
+  defp config(),
+    do:
+      Application.get_all_env(:syncthex)
+      |> Keyword.take([:url, :key])
+      |> Map.new()
+      |> config_with_cert()
 end
